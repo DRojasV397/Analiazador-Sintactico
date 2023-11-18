@@ -274,6 +274,174 @@ public class ASDR implements Parser{
             EQUALITY_2();
         }
     }
+
+    // COMPARISON -> TERM COMPARISON_2
+    private void COMPARISON(){
+        if (hayErrores) {
+            return;
+        }
+        TERM();
+        COMPARISON_2();
+    }
+
+    // COMPARISON_2 -> > TERM COMPARISON_2
+    //              -> >= TERM COMPARISON_2
+    //              -> < TERM COMPARISON_2
+    //              -> <= TERM COMPARISON_2
+    //              -> Ɛ
+    private void COMPARISON_2(){
+        if (hayErrores)
+            return;
+        if (preanalisis.tipo == TipoToken.GREATER) {
+            match(TipoToken.GREATER);
+            TERM();
+            COMPARISON_2();
+        } 
+        else 
+        if (preanalisis.tipo == TipoToken.GREATER_EQUAL) {
+            match(TipoToken.GREATER_EQUAL);
+            TERM();
+            COMPARISON_2();
+        }
+        else 
+        if (preanalisis.tipo == TipoToken.LESS) {
+            match(TipoToken.LESS);
+            TERM();
+            COMPARISON_2();
+        }
+        else 
+        if (preanalisis.tipo == TipoToken.LESS_EQUAL) {
+            match(TipoToken.LESS_EQUAL);
+            TERM();
+            COMPARISON_2();
+        }
+    }
+
+    // TERM -> FACTOR TERM_2
+    private void TERM(){
+        if (hayErrores)
+            return;
+        FACTOR();
+        TERM_2();
+    }
+
+    // TERM_2 -> - FACTOR TERM_2  |  + FACTOR TERM_2  |  Ɛ
+    private void TERM_2(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.MINUS){
+            match(TipoToken.MINUS);
+            FACTOR();
+            TERM_2();
+        }
+        else 
+        if(preanalisis.tipo == TipoToken.PLUS){
+            match(TipoToken.PLUS);
+            FACTOR();
+            TERM_2();
+        }
+    }
+
+    // FACTOR -> UNARY FACTOR_2
+    private void FACTOR(){
+        if (hayErrores) 
+            return;
+        UNARY();
+        FACTOR_2();
+    }
+
+    // FACTOR_2 -> / UNARY FACTOR_2  |  * UNARY FACTOR_2  |  Ɛ
+    private void FACTOR_2(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.SLASH){
+            match(TipoToken.SLASH);
+            UNARY();
+            FACTOR_2();
+        }
+        else 
+        if(preanalisis.tipo == TipoToken.STAR){
+            match(TipoToken.STAR);
+            UNARY();
+            FACTOR_2();
+        }
+    }
+
+    // UNARY -> ! UNARY  |  - UNARY  |  CALL
+    private void UNARY(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.BANG){
+            match(TipoToken.BANG);
+            UNARY();
+        }
+        else 
+        if(preanalisis.tipo == TipoToken.MINUS){
+            match(TipoToken.MINUS);
+            UNARY();
+        }
+        else
+            CALL();
+    }
+
+    // CALL -> PRIMARY CALL_2
+    private void CALL(){
+        if (hayErrores)
+            return;
+        PRIMARY();
+        CALL_2();
+    }
+
+    // CALL_2 -> ( ARGUMENTS_OPC ) CALL_2  |  Ɛ
+    private void CALL_2(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.LEFT_PAREN){
+            match(TipoToken.LEFT_PAREN);
+            ARGUMENTS_OPC();
+            matchErrores(TipoToken.RIGHT_PAREN);
+            CALL_2();
+        }
+    }
+
+    // PRIMARY -> true
+    //         -> false
+    //         -> null
+    //         -> number
+    //         -> string
+    //         -> id
+    //         -> ( EXPRESSION )
+    private void PRIMARY(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.TRUE)
+            match(TipoToken.TRUE);
+        else 
+        if(preanalisis.tipo == TipoToken.FALSE)
+            match(TipoToken.FALSE);
+        else 
+        if(preanalisis.tipo == TipoToken.NULL)
+            match(TipoToken.NULL);
+        else 
+        if(preanalisis.tipo == TipoToken.NUMBER)
+            match(TipoToken.NUMBER);
+        else 
+        if(preanalisis.tipo == TipoToken.STRING)
+            match(TipoToken.STRING);
+        else 
+        if(preanalisis.tipo == TipoToken.IDENTIFIER)
+            match(TipoToken.IDENTIFIER);
+        else 
+        if(preanalisis.tipo == TipoToken.LEFT_PAREN){
+            match(TipoToken.LEFT_PAREN);
+            EXPRESSION();
+            matchErrores(TipoToken.RIGHT_PAREN);
+        }
+        else{
+            hayErrores = true;
+            System.out.println("Se esperaba '(', un IDENTIFICADOR, una STRING, 'true', 'false', 'null', o un NUMERO");
+        }
+    }
     
     /************************************************************************
      *                                 Otras
