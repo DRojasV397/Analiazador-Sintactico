@@ -189,7 +189,91 @@ public class ASDR implements Parser{
     /************************************************************************
      *                              Expresiones
     ************************************************************************/
-    
+    // EXPRESSION -> ASSIGNMENT
+    private void EXPRESSION(){
+        if (hayErrores)
+            return;
+        ASSIGNMENT();
+    }
+
+    // ASSIGNMENT -> LOGIC_OR ASSIGNMENT_OPC
+    private void ASSIGNMENT(){
+        if (hayErrores)
+            return;
+        LOGIC_OR();
+        ASSIGNMENT_OPC();
+    }
+
+    // ASSIGNMENT_OPC -> = EXPRESSION | Ɛ
+    private void ASSIGNMENT_OPC(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.EQUAL){
+            match(TipoToken.EQUAL);
+            EXPRESSION();
+        }
+    }
+
+    // LOGIC_OR -> LOGIC_AND LOGIC_OR_2
+    private void LOGIC_OR(){
+        if (hayErrores)
+            return;
+        LOGIC_AND();
+        LOGIC_OR_2();
+    }
+    // LOGIC_OR_2 -> or LOGIC_AND LOGIC_OR_2 | Ɛ
+    private void LOGIC_OR_2(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.OR){
+            match(TipoToken.OR);
+            LOGIC_AND();
+            LOGIC_OR_2();
+        }
+    }
+
+    // LOGIC_AND -> EQUALITY LOGIC_AND_2
+    private void LOGIC_AND(){
+        if (hayErrores)
+            return;
+        EQUALITY();
+        LOGIC_AND_2();
+    }
+
+    // LOGIC_AND_2 -> and EQUALITY LOGIC_AND_2 | Ɛ
+    private void LOGIC_AND_2(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.AND){
+            match(TipoToken.AND);
+            EQUALITY();
+            LOGIC_AND_2();
+        }
+    }
+
+    // EQUALITY -> COMPARISON EQUALITY_2
+    private void EQUALITY(){
+        if (hayErrores)
+            return;
+        COMPARISON();
+        EQUALITY_2();
+    }
+
+    // EQUALITY_2 -> != COMPARISON EQUALITY_2  |  == COMPARISON EQUALITY_2  |  Ɛ
+    private void EQUALITY_2(){
+        if (hayErrores)
+            return;
+        if(preanalisis.tipo == TipoToken.EQUAL_EQUAL){
+            match(TipoToken.EQUAL_EQUAL);
+            COMPARISON();
+            EQUALITY_2();
+        }
+        else if(preanalisis.tipo == TipoToken.BANG_EQUAL){
+            match(TipoToken.BANG_EQUAL);
+            COMPARISON();
+            EQUALITY_2();
+        }
+    }
     
     /************************************************************************
      *                                 Otras
