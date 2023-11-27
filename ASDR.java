@@ -8,16 +8,16 @@ public class ASDR implements Parser{
     private boolean hayErrores = false;
     private Token preanalisis;
     private final List<Token> tokens;
-    private List<TipoToken> primeroEXPRESSION; //Se declara una lista en la que se incluiran los tokens que forman el conjunto primero de EXPRESSION
-    private List<TipoToken> primeroSTATEMENT;
-    private List<TipoToken> primeroEXPR_STMT;
-    private List<TipoToken> primeroFOR_STMT;
-    private List<TipoToken> primeroIF_STMT;
-    private List<TipoToken> primeroPRINT_STMT;
-    private List<TipoToken> primeroRETURN_STMT;
-    private List<TipoToken> primeroWHILE_STMT;
-    private List<TipoToken> primeroBLOCK_STMT;
-    private List<TipoToken> primeroVAR_DECL;
+    private List<TipoToken> primeroEXPRESSION= new ArrayList<>(); //Se declara una lista en la que se incluiran los tokens que forman el conjunto primero de EXPRESSION
+    private List<TipoToken> primeroSTATEMENT= new ArrayList<>();
+    private List<TipoToken> primeroEXPR_STMT= new ArrayList<>();
+    private List<TipoToken> primeroFOR_STMT= new ArrayList<>();
+    private List<TipoToken> primeroIF_STMT= new ArrayList<>();
+    private List<TipoToken> primeroPRINT_STMT= new ArrayList<>();
+    private List<TipoToken> primeroRETURN_STMT= new ArrayList<>();
+    private List<TipoToken> primeroWHILE_STMT= new ArrayList<>();
+    private List<TipoToken> primeroBLOCK_STMT= new ArrayList<>();
+    private List<TipoToken> primeroVAR_DECL= new ArrayList<>();
     public ASDR(List<Token> tokens){
         this.tokens = tokens;
         preanalisis = this.tokens.get(i);
