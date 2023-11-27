@@ -70,7 +70,7 @@ public class ASDR implements Parser{
         //Se agregan los elementos del conjunto primero de WHILE_STAMENT
         primeroWHILE_STMT.add(TipoToken.WHILE);
         //Se agregan los elementos del conjunto primero de BLOCK_STAMENT
-        primeroBLOCK_STMT.add(TipoToken.LEFT_PAREN);
+        primeroBLOCK_STMT.add(TipoToken.LEFT_BRACE);
         //Se agregan los elementos del conjunto primero de VAR_DECL
         primeroVAR_DECL.add(TipoToken.VAR);
      
@@ -216,7 +216,7 @@ public class ASDR implements Parser{
     /************************************************************************
      *                              Sentencias
     ************************************************************************/     
-    //SATAMENT -> EXPR_STMT
+    //STATEMENT -> EXPR_STMT
              // -> FOR_STMT
              // -> IF_STMT
              // -> PRINT_STMT
@@ -333,6 +333,12 @@ public class ASDR implements Parser{
         }
         else if (primeroEXPRESSION.contains(preanalisis.tipo)) {
             EXPRESSION();
+            if (preanalisis.tipo==TipoToken.SEMICOLON) {
+                match(TipoToken.SEMICOLON);
+            } else {
+                hayErrores=true;
+                System.out.println("Se esperaba un ;");
+            }
         }
         else if(preanalisis.tipo==TipoToken.SEMICOLON){
             match(TipoToken.SEMICOLON);
@@ -422,10 +428,16 @@ public class ASDR implements Parser{
         if (preanalisis.tipo==TipoToken.RETURN) {
             match(TipoToken.RETURN);
             RETURN_EXP_OPC();
+            if (preanalisis.tipo==TipoToken.SEMICOLON) {
+                match(TipoToken.SEMICOLON);
+            } else {
+                hayErrores=true;
+                System.out.println("Se esperaba un ;");
+            }
         }
         else{
             hayErrores=true;
-            System.out.println("Se esperaba un PRINT");
+            System.out.println("Se esperaba un RETURN");
         }
     }
     //RETURN_EXP_OPC -> EXPRESSION
@@ -473,18 +485,18 @@ public class ASDR implements Parser{
         if (hayErrores) {
             return;
         }
-        if (preanalisis.tipo==TipoToken.LEFT_PAREN) {
-            match(TipoToken.LEFT_PAREN);
+        if (preanalisis.tipo==TipoToken.LEFT_BRACE) {
+            match(TipoToken.LEFT_BRACE);
             DECLARATION();
-            if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
-                match(TipoToken.RIGHT_PAREN);
+            if (preanalisis.tipo==TipoToken.RIGHT_BRACE) {
+                match(TipoToken.RIGHT_BRACE);
             } else {
                 hayErrores=true;
-                System.out.println("Se esperaba un RIGHT PAREN"); 
+                System.out.println("Se esperaba un RIGHT BRACE"); 
             }
         } else {
             hayErrores=true;
-            System.out.println("Se esperaba un LEFT PAREN");
+            System.out.println("Se esperaba un LEFT BRACE");
         }
     }
 
@@ -705,10 +717,10 @@ public class ASDR implements Parser{
             ARGUMENTS_OPC();
             if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                 match(TipoToken.RIGHT_PAREN);
+                CALL_2();
             } else {
                 System.out.println("Se esperaba RIGHT PAREN");   
             }
-            CALL_2();
         }
     }
 
