@@ -18,6 +18,8 @@ public class ASDR implements Parser{
     private List<TipoToken> primeroWHILE_STMT= new ArrayList<>();
     private List<TipoToken> primeroBLOCK_STMT= new ArrayList<>();
     private List<TipoToken> primeroVAR_DECL= new ArrayList<>();
+    private List<Statement> sentencias = new ArrayList<>();
+
     public ASDR(List<Token> tokens){
         this.tokens = tokens;
         preanalisis = this.tokens.get(i);
@@ -73,7 +75,7 @@ public class ASDR implements Parser{
         primeroBLOCK_STMT.add(TipoToken.LEFT_BRACE);
         //Se agregan los elementos del conjunto primero de VAR_DECL
         primeroVAR_DECL.add(TipoToken.VAR);
-     
+    
     }
 
     @Override
@@ -81,7 +83,7 @@ public class ASDR implements Parser{
         PROGRAM();
         if(preanalisis.tipo == TipoToken.EOF && !hayErrores){
             System.out.println("La sintaxis es correcta");
-            return  true;
+            return true;
         }else {
             System.out.println("Se encontraron errores");
         }
@@ -98,7 +100,8 @@ public class ASDR implements Parser{
     ************************************************************************/
 
     private void DECLARATION(){
-        if(hayErrores) //Termina el 
+        Statement sentencia;
+        if(hayErrores)
             return;
 
         /*
@@ -107,33 +110,35 @@ public class ASDR implements Parser{
          */
 
         // DECLARATION -> FUN_DECL DECLARATION
+        
         else if(preanalisis.tipo == TipoToken.FUN){
-            FUN_DECL();
+            sentencia = FUN_DECL();
+            sentencias.add(sentencia);
             DECLARATION();
         }
         // DECLARATION -> VAR_DECL DECLARATION
         else if (preanalisis.tipo == TipoToken.VAR){
-            VAR_DECL();
+            sentencia = VAR_DECL();
+            sentencias.add(sentencia);
             DECLARATION();
         }
         // DECLARATION -> STATEMENT DECLARATION
         else if (primeroSTATEMENT.contains(preanalisis.tipo)){
-            STATEMENT();
+            sentencia = STATEMENT();
+            sentencias.add(sentencia);
             DECLARATION();
         }
-
         /*
         * La producción DECLARATION -> Ɛ no se incluye en codigo, debido a esto, 
         * si el tipo de preanalisis no coincide con ninguno de los tipos de los if
         * No se conciderará como error.
         */
-
     }
     
     // FUN_DECL -> fun FUNCTION
-    private void FUN_DECL(){
+    private StmtFunction FUN_DECL(){
         if(hayErrores)
-            return;
+            return null;
         
         /*
          * En esta función, a diferencia de la funcion anterior, primero 
@@ -146,14 +151,15 @@ public class ASDR implements Parser{
         match(TipoToken.FUN);
         if(hayErrores){
             System.out.println("Se esperaba una FUNCION");
+            return null;
         }
-        FUNCTION();
+        return FUNCTION();
     }
 
     // VAR_DECL -> var id VAR_INIT ;
-    private void VAR_DECL(){
+    private StmtVar VAR_DECL(){
         if(hayErrores)
-            return;
+            return null;
         
         /*
          * En esta función primero se compara que el elemento del preanalisis 
@@ -170,8 +176,8 @@ public class ASDR implements Parser{
             match(TipoToken.VAR);
             if(preanalisis.tipo == TipoToken.IDENTIFIER){
                 match(TipoToken.IDENTIFIER);
-                VAR_INIT();
-
+                Token identificador = previous();
+                Expression inicializacion = VAR_INIT();
                 /*
                  * Esta es otra forma de manejar los errores.
                  * Despues de usar la función match() se verifica si hay errores, si
@@ -181,28 +187,31 @@ public class ASDR implements Parser{
                 match(TipoToken.SEMICOLON);
                 if(hayErrores){
                     System.out.println("Se esperaba ';'");
-                    return;
+                    return null;
                 }
+                return new StmtVar(identificador, inicializacion);
             }
             else{
                 hayErrores = true;
                 System.out.println("Se esperaba un IDENTIFICADOR luego de VAR.");
+                return null;
             }
         }
         else{
             hayErrores = true;
             System.out.println("Se esperaba una VARIABLE");
+            return null;
         }
     }
 
     // VAR_INIT -> = EXPRESSION | Ɛ
-    private void VAR_INIT(){
+    private Expression VAR_INIT(){
         if(hayErrores)
-            return;
+            return null;
 
         if(preanalisis.tipo == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
-            EXPRESSION();
+            return EXPRESSION();
         }
 
         /*
@@ -772,54 +781,68 @@ public class ASDR implements Parser{
     ************************************************************************/
 
     //FUNCTION -> id ( PARAMETERS_OPC ) BLOCK
-    private void FUNCTION(){
+    private StmtFunction FUNCTION(){
         if(hayErrores)
-            return;
-
-        if(preanalisis.tipo == TipoToken.IDENTIFIER){
-            match(TipoToken.IDENTIFIER);
-            if(hayErrores){
-                System.out.println("Se esperaba un IDENTIFICADOR");
-                return;
-            }
-            match(TipoToken.LEFT_PAREN);
-            if(hayErrores){
-                System.out.println("Se esperaba '(''");
-                return;
-            }
-            PARAMETERS_OPC();
-            match(TipoToken.RIGHT_PAREN);
-            if (hayErrores) {
-                System.out.println("Se esperaba ')''");
-                return;
-            }
-            BLOCK();
-        }
-    }
-
-    // PARAMETERS_OPC -> PARAMETERS | Ɛ
-    private void PARAMETERS_OPC(){
-        if(hayErrores)
-            return;
-
-        PARAMETERS();
-    }
-
-    // PARAMETERS -> id PARAMETERS_2
-    private void PARAMETERS(){
-        if(hayErrores)
-            return;
+            return null;
 
         match(TipoToken.IDENTIFIER);
         if(hayErrores){
             System.out.println("Se esperaba un IDENTIFICADOR");
-            return;
+            return null;
         }
-        PARAMETERS_2();
+        Token identificador = previous();
+
+        match(TipoToken.LEFT_PAREN);
+        if(hayErrores){
+            System.out.println("Se esperaba '(''");
+            return null;
+        }
+
+        List<Token> parametros = PARAMETERS_OPC();
+
+        match(TipoToken.RIGHT_PAREN);
+        if (hayErrores) {
+            System.out.println("Se esperaba ')''");
+            return null;
+        }
+
+        StmtBlock bloque = BLOCK();
+
+        return new StmtFunction(identificador, parametros, bloque);
+    }
+
+    // PARAMETERS_OPC -> PARAMETERS | Ɛ
+    private List<Token> PARAMETERS_OPC(){
+        if(hayErrores)
+            return null;
+
+        List<Token> parametros = new ArrayList<Token>();
+        if(preanalisis.tipo == TipoToken.IDENTIFIER){
+            parametros = PARAMETERS();
+            return parametros;
+        }
+        return parametros;
+    }
+
+    // PARAMETERS -> id PARAMETERS_2
+    private List<Token> PARAMETERS(){
+        if(hayErrores)
+            return null;
+
+        List<Token> parametros = new ArrayList<Token>();
+        match(TipoToken.IDENTIFIER);
+        if(hayErrores){
+            System.out.println("Se esperaba un IDENTIFICADOR");
+            return null;
+        }
+        Token parametro = previous();
+        parametros.add(parametro);
+        PARAMETERS_2(parametros);
+        return parametros;
     }
 
     //PARAMETERS_2 -> , id PARAMETERS_2 | Ɛ
-    private void PARAMETERS_2(){
+    private void PARAMETERS_2(List<Token> parametros){
         if(hayErrores)
             return;
 
@@ -830,38 +853,44 @@ public class ASDR implements Parser{
                 System.out.println("Se esperaba un IDENTIFICADOR");
                 return;
             }
-            PARAMETERS_2();
+            Token parametro = previous();
+            parametros.add(parametro);
+            PARAMETERS_2(parametros);
         }
     }
 
     // ARGUMENTS_OPC -> EXPRESSION ARGUMENTS | Ɛ
-    private void ARGUMENTS_OPC(){
+    private List<Expression> ARGUMENTS_OPC(){
         if(hayErrores)
-            return;
-        
+            return null;
         /*
-        
          * Se verifica si el tipo de preanalisis pertenece al conjunto primero de EXPRESSION, 
          * de lo contrario se tomara como la producción Ɛ.
          * Esto se podria hacer comparando de forma directa dentro del if el tipo de preanalisis 
          * con los elementos del conjunto primero de EXPRESSION pero de esta forma el codigo se 
          * vuelve mas legible.
          */
+        List<Expression> expresiones = new ArrayList<Expression>();
         if(primeroEXPRESSION.contains(preanalisis.tipo)){
-            EXPRESSION();
-            ARGUMENTS();
+            Expression expresion = EXPRESSION();
+            expresiones.add(expresion);
+            ARGUMENTS(expresiones);
+            return expresiones;
         }
+        else
+            return expresiones;
     }
 
     // ARGUMENTS -> , EXPRESSION ARGUMENTS | Ɛ
-    private void ARGUMENTS(){
+    private void ARGUMENTS(List<Expression> expresiones){
         if(hayErrores)
             return;
         
         if(preanalisis.tipo == TipoToken.COMMA){
             match(TipoToken.COMMA);
-            EXPRESSION();
-            ARGUMENTS();
+            Expression expresion = EXPRESSION();
+            expresiones.add(expresion);
+            ARGUMENTS(expresiones);
         }
     }
 
@@ -877,5 +906,9 @@ public class ASDR implements Parser{
             else{
                 hayErrores = true;
             }
-        }
+    }
+
+    private Token previous() {
+        return this.tokens.get(i - 1);
+    }
 }
