@@ -523,21 +523,26 @@ public class ASDR implements Parser{
     }
 
     // ASSIGNMENT -> LOGIC_OR ASSIGNMENT_OPC
-    private void ASSIGNMENT(){
+    private Expression ASSIGNMENT(){
         if (hayErrores)
-            return;
-        LOGIC_OR();
-        ASSIGNMENT_OPC();
+            return null;
+        Expression expresion = LOGIC_OR();
+        Expression aux = ASSIGNMENT_OPC(expresion);
+        return aux;
     }
 
     // ASSIGNMENT_OPC -> = EXPRESSION | Ɛ
-    private void ASSIGNMENT_OPC(){
+    private Expression ASSIGNMENT_OPC(Expression expresion){
         if (hayErrores)
-            return;
+            return null;
         if(preanalisis.tipo == TipoToken.EQUAL){
             match(TipoToken.EQUAL);
-            EXPRESSION();
+            Expression valor = EXPRESSION(); 
+            Token aux1 = ((ExprVariable) expresion).name;
+            Expression aux2 = new ExprAssign(aux1, valor);
         }
+        else   
+            return expresion;
     }
 
     // LOGIC_OR -> LOGIC_AND LOGIC_OR_2
