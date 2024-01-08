@@ -517,7 +517,7 @@ public class ASDR implements Parser{
     // EXPRESSION -> ASSIGNMENT
     private Expression EXPRESSION(){
         if (hayErrores)
-            return;
+            return null;
         Expression expresion = ASSIGNMENT();
         return expresion;
     }
@@ -616,7 +616,7 @@ public class ASDR implements Parser{
         }
         Expression expresion = TERM();
         Expression aux = COMPARISON_2(expresion);
-        return expresion;
+        return aux;
     }
 
     // COMPARISON_2 -> > TERM COMPARISON_2
@@ -691,7 +691,7 @@ public class ASDR implements Parser{
             match(TipoToken.PLUS);
             Token operador = previous();
             Expression expresion2_2 = FACTOR();
-            Expression aux1_2 = new ExprBinary(expresion1, operador, expresion2_1);
+            Expression aux1_2 = new ExprBinary(expresion1, operador, expresion2_2);
             Expression aux2_2 = TERM_2(aux1_2);
             return aux2_2;
         }
@@ -727,7 +727,7 @@ public class ASDR implements Parser{
             Expression expresion2_2 = UNARY();
             ExprBinary aux1_2 = new ExprBinary(expresion1, operador1, expresion2_2);
             Expression aux2_2 = FACTOR_2(aux1_2);
-            return aux1_2;
+            return aux2_2;
         }
         else
             return expresion1;
@@ -778,7 +778,7 @@ public class ASDR implements Parser{
                 match(TipoToken.RIGHT_PAREN);
                 ExprCallFunction aux = new ExprCallFunction(expresion, argumentos); 
                 Expression aux2 = CALL_2(aux);
-                return aux;
+                return aux2;
             } else {
                 System.out.println("Se esperaba RIGHT PAREN");  
                 return null;
