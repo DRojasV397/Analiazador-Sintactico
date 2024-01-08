@@ -540,6 +540,7 @@ public class ASDR implements Parser{
             Expression valor = EXPRESSION(); 
             Token aux1 = ((ExprVariable) expresion).name;
             Expression aux2 = new ExprAssign(aux1, valor);
+            return aux2;
         }
         else   
             return expresion;
