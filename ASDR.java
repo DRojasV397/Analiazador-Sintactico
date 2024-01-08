@@ -652,68 +652,93 @@ public class ASDR implements Parser{
     }
 
     // TERM_2 -> - FACTOR TERM_2  |  + FACTOR TERM_2  |  Ɛ
-    private void TERM_2(){
+    private Expression TERM_2(Expression expresion1){
         if (hayErrores)
-            return;
+            return null;
         if(preanalisis.tipo == TipoToken.MINUS){
             match(TipoToken.MINUS);
-            FACTOR();
-            TERM_2();
+            Token operador = previous();
+            Expression expresion2_1 = FACTOR();
+            Expression aux1_1 = new ExprBinary(expresion1, operador, expresion2_1);
+            Expression aux2_1 = TERM_2(aux1_1);
+            return aux2_1;
         }
         else 
         if(preanalisis.tipo == TipoToken.PLUS){
             match(TipoToken.PLUS);
-            FACTOR();
-            TERM_2();
+            Token operador = previous();
+            Expression expresion2_2 = FACTOR();
+            Expression aux1_2 = new ExprBinary(expresion1, operador, expresion2_1);
+            Expression aux2_2 = TERM_2(aux1_2);
+            return aux2_2;
         }
+        else
+            return expresion1;
     }
 
     // FACTOR -> UNARY FACTOR_2
-    private void FACTOR(){
+    private Expression FACTOR(){
         if (hayErrores) 
-            return;
-        UNARY();
-        FACTOR_2();
+            return null;
+        Expression expresion = UNARY();
+        Expression aux = FACTOR_2(expresion);
+        return aux;
     }
 
     // FACTOR_2 -> / UNARY FACTOR_2  |  * UNARY FACTOR_2  |  Ɛ
-    private void FACTOR_2(){
+    private Expression FACTOR_2(Expression expresion1){
         if (hayErrores)
-            return;
+            return null;
         if(preanalisis.tipo == TipoToken.SLASH){
             match(TipoToken.SLASH);
-            UNARY();
-            FACTOR_2();
+            Expression operador = previous();
+            Expression expresion2 = UNARY();
+            ExprBinary aux1 = new ExprBinary(expresion1, operador, expresion2);
+            Expression aux2 = FACTOR_2(aux1);
+            return aux2;
         }
         else 
         if(preanalisis.tipo == TipoToken.STAR){
             match(TipoToken.STAR);
-            UNARY();
-            FACTOR_2();
+            Expression operador1 = previous();
+            Expression expresion2_2 = UNARY();
+            ExprBinary aux1_2 = new ExprBinary(expresion1, operador1, expresion2_2);
+            Expression aux2_2 = FACTOR_2(aux1_2);
+            return aux1_2;
         }
+        else
+            return expresion1;
     }
 
     // UNARY -> ! UNARY  |  - UNARY  |  CALL
-    private void UNARY(){
+    private Expression UNARY(){
         if (hayErrores)
-            return;
+            return null;
         if(preanalisis.tipo == TipoToken.BANG){
             match(TipoToken.BANG);
-            UNARY();
+            Token operador = previous();
+            Expression expresion = UNARY();
+            Expression aux = new ExprUnary(operador, expresion);
+            return aux;
         }
         else 
         if(preanalisis.tipo == TipoToken.MINUS){
             match(TipoToken.MINUS);
-            UNARY();
+            Token operador1 = previous();
+            Expression expresion1 = UNARY();
+            Expression aux1 = new ExprUnary(operador1, expresion1);
+            return aux1;
         }
-        else
-            CALL();
+        else{
+            Expression aux2 = CALL();
+            return aux2;
+        }
     }
 
     // CALL -> PRIMARY CALL_2
     private Expression CALL(){
         if (hayErrores)
-            return;
+            return null;
         Expression expresion = PRIMARY();
         Expression aux = CALL_2(expresion);
         return aux;
@@ -728,7 +753,7 @@ public class ASDR implements Parser{
             List<Expression> argumentos = ARGUMENTS_OPC();
             if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                 match(TipoToken.RIGHT_PAREN);
-                ExprCallFunction aux = ExprCallFunction(expresion, argumentos); 
+                ExprCallFunction aux = new ExprCallFunction(expresion, argumentos); 
                 Expression aux2 = CALL_2(aux)
                 return aux;
             } else {
