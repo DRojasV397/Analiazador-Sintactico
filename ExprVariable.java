@@ -4,4 +4,9 @@ class ExprVariable extends Expression {
     ExprVariable(Token name) {
         this.name = name;
     }
+
+    @Override
+    Object solve(TablaSimbolos tablaSimbolos) {
+        return tablaSimbolos.obtener(name.lexema);
+    }
 }

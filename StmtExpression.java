@@ -4,4 +4,9 @@ public class StmtExpression extends Statement {
     StmtExpression(Expression expression) {
         this.expression = expression;
     }
+
+    @Override
+    void exec(TablaSimbolos tablaSimbolos) {
+        expression.solve(tablaSimbolos);
+    }
 }

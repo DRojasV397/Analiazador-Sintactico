@@ -4,4 +4,9 @@ class ExprLiteral extends Expression {
     ExprLiteral(Object value) {
         this.value = value;
     }
+
+    @Override
+    Object solve(TablaSimbolos tablaSimbolos) {
+        return value;
+    }
 }
