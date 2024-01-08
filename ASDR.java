@@ -541,21 +541,27 @@ public class ASDR implements Parser{
     }
 
     // LOGIC_OR -> LOGIC_AND LOGIC_OR_2
-    private void LOGIC_OR(){
+    private Expression LOGIC_OR(){
         if (hayErrores)
-            return;
-        LOGIC_AND();
-        LOGIC_OR_2();
+            return null;
+        Expression expresion = LOGIC_AND();
+        Expression aux = LOGIC_OR_2(expresion);
+        return aux;
     }
     // LOGIC_OR_2 -> or LOGIC_AND LOGIC_OR_2 | Ɛ
-    private void LOGIC_OR_2(){
+    private Expression LOGIC_OR_2(Expression expresion1){
         if (hayErrores)
-            return;
+            return null;
         if(preanalisis.tipo == TipoToken.OR){
             match(TipoToken.OR);
-            LOGIC_AND();
-            LOGIC_OR_2();
+            Token operador = previous();
+            Expression expresion2 = LOGIC_AND();
+            Expression aux1 = new ExprLogical(expresion1, operador, expresion2);
+            Expression aux2 = LOGIC_OR_2(aux1);
+            return aux2;
         }
+        else
+            return expresion1;
     }
 
     // LOGIC_AND -> EQUALITY LOGIC_AND_2
@@ -568,7 +574,7 @@ public class ASDR implements Parser{
     }
 
     // LOGIC_AND_2 -> and EQUALITY LOGIC_AND_2 | Ɛ
-    private Expression LOGIC_AND_2(Expression expression1){
+    private Expression LOGIC_AND_2(Expression expresion1){
         if (hayErrores)
             return null;
         if(preanalisis.tipo == TipoToken.AND){
