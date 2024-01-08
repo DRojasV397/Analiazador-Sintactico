@@ -612,7 +612,7 @@ public class ASDR implements Parser{
             match(TipoToken.EQUAL_EQUAL);
             Token operador_1 = previous();
             Expression expresion2_1 = COMPARISON();
-            Expression aux1_1 = new ExprLogical(expresion1, operador_1, expresion2_1);
+            Expression aux1_1 = new ExprBinary(expresion1, operador_1, expresion2_1);
             Expression aux2_1 = EQUALITY_2(aux1_1);
             return aux2_1;
         }
@@ -620,7 +620,7 @@ public class ASDR implements Parser{
             match(TipoToken.BANG_EQUAL);
             Token operador_2 = previous();
             Expression expresion2_2 = COMPARISON();
-            Expression aux1_2 = new ExprLogical(expresion1, operador_2, expresion2_2);
+            Expression aux1_2 = new ExprBinary(expresion1, operador_2, expresion2_2);
             Expression aux2_2 = EQUALITY_2(aux1_2);
             return aux2_2;
         }
@@ -649,7 +649,7 @@ public class ASDR implements Parser{
             match(TipoToken.GREATER);
             Token operador_1 = previous();
             Expression expresion2_1 = TERM();
-            Expression aux1_1 = new ExprLogical(expresion1, operador_1, expresion2_1);
+            Expression aux1_1 = new ExprBinary(expresion1, operador_1, expresion2_1);
             Expression aux2_1 = COMPARISON_2(aux1_1);
             return aux2_1;
         } 
@@ -658,7 +658,7 @@ public class ASDR implements Parser{
             match(TipoToken.GREATER_EQUAL);
             Token operador_2 = previous();
             Expression expresion2_2 = TERM();
-            Expression aux1_2 = new ExprLogical(expresion1, operador_2, expresion2_2);
+            Expression aux1_2 = new ExprBinary(expresion1, operador_2, expresion2_2);
             Expression aux2_2 = COMPARISON_2(aux1_2);
             return aux2_2;
         }
@@ -667,7 +667,7 @@ public class ASDR implements Parser{
             match(TipoToken.LESS);
             Token operador_3 = previous();
             Expression expresion2_3 = TERM();
-            Expression aux1_3 = new ExprLogical(expresion1, operador_3, expresion2_3);
+            Expression aux1_3 = new ExprBinary(expresion1, operador_3, expresion2_3);
             Expression aux2_3 = COMPARISON_2(aux1_3);
             return aux2_3;
         }
@@ -676,7 +676,7 @@ public class ASDR implements Parser{
             match(TipoToken.LESS_EQUAL);
             Token operador_4 = previous();
             Expression expresion2_4 = TERM();
-            Expression aux1_4 = new ExprLogical(expresion1, operador_4, expresion2_4);
+            Expression aux1_4 = new ExprBinary(expresion1, operador_4, expresion2_4);
             Expression aux2_4 = COMPARISON_2(aux1_4);
             return aux2_4;
         }
