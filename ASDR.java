@@ -213,7 +213,7 @@ public class ASDR implements Parser{
             match(TipoToken.EQUAL);
             return EXPRESSION();
         }
-
+        return null;
         /*
         * La producción DECLARATION -> Ɛ no se incluye en codigo, debido a esto, 
         * si el tipo de preanalisis no coincide con ninguno de los tipos de los if

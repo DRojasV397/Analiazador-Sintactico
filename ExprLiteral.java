@@ -1,5 +1,3 @@
-package mx.ipn.escom.k.parser;
-
 class ExprLiteral extends Expression {
     final Object value;
 

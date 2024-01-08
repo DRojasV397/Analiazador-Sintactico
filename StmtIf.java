@@ -1,5 +1,3 @@
-package mx.ipn.escom.k.parser;
-
 public class StmtIf extends Statement {
     final Expression condition;
     final Statement thenBranch;
