@@ -578,36 +578,45 @@ public class ASDR implements Parser{
     }
 
     // EQUALITY -> COMPARISON EQUALITY_2
-    private void EQUALITY(){
+    private Expression EQUALITY(){
         if (hayErrores)
-            return;
-        COMPARISON();
-        EQUALITY_2();
+            return null;
+        Expression expresion = COMPARISON();
+        Expression aux = EQUALITY_2(expresion);
+        return aux;
     }
 
     // EQUALITY_2 -> != COMPARISON EQUALITY_2  |  == COMPARISON EQUALITY_2  |  Ɛ
-    private void EQUALITY_2(){
+    private Expression EQUALITY_2(Expression expresion1){
         if (hayErrores)
-            return;
+            return null;
         if(preanalisis.tipo == TipoToken.EQUAL_EQUAL){
             match(TipoToken.EQUAL_EQUAL);
-            COMPARISON();
-            EQUALITY_2();
+            Token operador_1 = previous();
+            Expression expresion2_1 = COMPARISON();
+            Expression aux1_1 = new ExprLogical(expresion1, operador_1, expresion2_1);
+            Expression aux2_1 = EQUALITY_2(aux1_1);
+            return aux2_1;
         }
         else if(preanalisis.tipo == TipoToken.BANG_EQUAL){
             match(TipoToken.BANG_EQUAL);
-            COMPARISON();
-            EQUALITY_2();
+            Token operador_2 = previous();
+            Expression expresion2_2 = COMPARISON();
+            Expression aux1_2 = new ExprLogical(expresion1, operador_2, expresion2_2);
+            Expression aux2_2 = EQUALITY_2(aux1_2);
+            return aux2_2;
         }
+        return expresion1;
     }
 
     // COMPARISON -> TERM COMPARISON_2
-    private void COMPARISON(){
+    private Expression COMPARISON(){
         if (hayErrores) {
-            return;
+            return null;
         }
-        TERM();
-        COMPARISON_2();
+        Expression expresion = TERM();
+        Expression aux = COMPARISON_2(expresion);
+        return expresion;
     }
 
     // COMPARISON_2 -> > TERM COMPARISON_2
@@ -615,40 +624,54 @@ public class ASDR implements Parser{
     //              -> < TERM COMPARISON_2
     //              -> <= TERM COMPARISON_2
     //              -> Ɛ
-    private void COMPARISON_2(){
+    private Expression COMPARISON_2(Expression expresion1){
         if (hayErrores)
-            return;
+            return null;
         if (preanalisis.tipo == TipoToken.GREATER) {
             match(TipoToken.GREATER);
-            TERM();
-            COMPARISON_2();
+            Token operador_1 = previous();
+            Expression expresion2_1 = TERM();
+            Expression aux1_1 = new ExprLogical(expresion1, operador_1, expresion2_1);
+            Expression aux2_1 = COMPARISON_2(aux1_1);
+            return aux2_1;
         } 
         else 
         if (preanalisis.tipo == TipoToken.GREATER_EQUAL) {
             match(TipoToken.GREATER_EQUAL);
-            TERM();
-            COMPARISON_2();
+            Token operador_2 = previous();
+            Expression expresion2_2 = TERM();
+            Expression aux1_2 = new ExprLogical(expresion1, operador_2, expresion2_2);
+            Expression aux2_2 = COMPARISON_2(aux1_2);
+            return aux2_2;
         }
         else 
         if (preanalisis.tipo == TipoToken.LESS) {
             match(TipoToken.LESS);
-            TERM();
-            COMPARISON_2();
+            Token operador_3 = previous();
+            Expression expresion2_3 = TERM();
+            Expression aux1_3 = new ExprLogical(expresion1, operador_3, expresion2_3);
+            Expression aux2_3 = COMPARISON_2(aux1_3);
+            return aux2_3;
         }
         else 
         if (preanalisis.tipo == TipoToken.LESS_EQUAL) {
             match(TipoToken.LESS_EQUAL);
-            TERM();
-            COMPARISON_2();
+            Token operador_4 = previous();
+            Expression expresion2_4 = TERM();
+            Expression aux1_4 = new ExprLogical(expresion1, operador_4, expresion2_4);
+            Expression aux2_4 = COMPARISON_2(aux1_4);
+            return aux2_4;
         }
+        return expresion1;
     }
 
     // TERM -> FACTOR TERM_2
-    private void TERM(){
+    private Expression TERM(){
         if (hayErrores)
-            return;
-        FACTOR();
-        TERM_2();
+            return null;
+        Expression expresion = FACTOR();
+        Expression aux = TERM_2(expresion);
+        return aux;
     }
 
     // TERM_2 -> - FACTOR TERM_2  |  + FACTOR TERM_2  |  Ɛ
@@ -691,7 +714,7 @@ public class ASDR implements Parser{
             return null;
         if(preanalisis.tipo == TipoToken.SLASH){
             match(TipoToken.SLASH);
-            Expression operador = previous();
+            Token operador = previous();
             Expression expresion2 = UNARY();
             ExprBinary aux1 = new ExprBinary(expresion1, operador, expresion2);
             Expression aux2 = FACTOR_2(aux1);
@@ -700,7 +723,7 @@ public class ASDR implements Parser{
         else 
         if(preanalisis.tipo == TipoToken.STAR){
             match(TipoToken.STAR);
-            Expression operador1 = previous();
+            Token operador1 = previous();
             Expression expresion2_2 = UNARY();
             ExprBinary aux1_2 = new ExprBinary(expresion1, operador1, expresion2_2);
             Expression aux2_2 = FACTOR_2(aux1_2);
@@ -754,7 +777,7 @@ public class ASDR implements Parser{
             if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                 match(TipoToken.RIGHT_PAREN);
                 ExprCallFunction aux = new ExprCallFunction(expresion, argumentos); 
-                Expression aux2 = CALL_2(aux)
+                Expression aux2 = CALL_2(aux);
                 return aux;
             } else {
                 System.out.println("Se esperaba RIGHT PAREN");  
