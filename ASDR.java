@@ -515,10 +515,11 @@ public class ASDR implements Parser{
      *                              Expresiones
     ************************************************************************/
     // EXPRESSION -> ASSIGNMENT
-    private void EXPRESSION(){
+    private Expression EXPRESSION(){
         if (hayErrores)
             return;
-        ASSIGNMENT();
+        Expression expresion = ASSIGNMENT();
+        return expresion;
     }
 
     // ASSIGNMENT -> LOGIC_OR ASSIGNMENT_OPC
@@ -710,27 +711,33 @@ public class ASDR implements Parser{
     }
 
     // CALL -> PRIMARY CALL_2
-    private void CALL(){
+    private Expression CALL(){
         if (hayErrores)
             return;
-        PRIMARY();
-        CALL_2();
+        Expression expresion = PRIMARY();
+        Expression aux = CALL_2(expresion);
+        return aux;
     }
 
     // CALL_2 -> ( ARGUMENTS_OPC ) CALL_2  |  Ɛ
-    private void CALL_2(){
+    private Expression CALL_2(Expression expresion){
         if (hayErrores)
-            return;
+            return null;
         if(preanalisis.tipo == TipoToken.LEFT_PAREN){
             match(TipoToken.LEFT_PAREN);
-            ARGUMENTS_OPC();
+            List<Expression> argumentos = ARGUMENTS_OPC();
             if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                 match(TipoToken.RIGHT_PAREN);
-                CALL_2();
+                ExprCallFunction aux = ExprCallFunction(expresion, argumentos); 
+                Expression aux2 = CALL_2(aux)
+                return aux;
             } else {
-                System.out.println("Se esperaba RIGHT PAREN");   
+                System.out.println("Se esperaba RIGHT PAREN");  
+                return null;
             }
         }
+        else
+            return expresion;
     }
 
     // PRIMARY -> true
@@ -740,39 +747,61 @@ public class ASDR implements Parser{
     //         -> string
     //         -> id
     //         -> ( EXPRESSION )
-    private void PRIMARY(){
+    private Expression PRIMARY(){
         if (hayErrores)
-            return;
-        if(preanalisis.tipo == TipoToken.TRUE)
+            return null;
+        Expression expresion;
+        if(preanalisis.tipo == TipoToken.TRUE){
             match(TipoToken.TRUE);
+            expresion = new ExprLiteral(true);
+            return expresion;
+            }
         else 
-        if(preanalisis.tipo == TipoToken.FALSE)
+        if(preanalisis.tipo == TipoToken.FALSE){
             match(TipoToken.FALSE);
+            expresion = new ExprLiteral(true);
+            return expresion;
+            }
         else 
-        if(preanalisis.tipo == TipoToken.NULL)
+        if(preanalisis.tipo == TipoToken.NULL){
             match(TipoToken.NULL);
+            expresion = new ExprLiteral(null);
+            return expresion;
+            }
         else 
-        if(preanalisis.tipo == TipoToken.NUMBER)
+        if(preanalisis.tipo == TipoToken.NUMBER){
             match(TipoToken.NUMBER);
+            expresion = new ExprLiteral(previous().literal);
+            return expresion;
+            }
         else 
-        if(preanalisis.tipo == TipoToken.STRING)
+        if(preanalisis.tipo == TipoToken.STRING){
             match(TipoToken.STRING);
+            expresion = new ExprLiteral(previous().literal);
+            return expresion;
+            }
         else 
-        if(preanalisis.tipo == TipoToken.IDENTIFIER)
+        if(preanalisis.tipo == TipoToken.IDENTIFIER){
             match(TipoToken.IDENTIFIER);
+            expresion = new ExprVariable(previous());
+            return expresion;
+            }
         else 
         if(preanalisis.tipo == TipoToken.LEFT_PAREN){
             match(TipoToken.LEFT_PAREN);
-            EXPRESSION();
+            expresion = EXPRESSION();
             if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                 match(TipoToken.RIGHT_PAREN);
+                return new ExprGrouping(expresion);
             } else {
-                System.out.println("Se esperaba RIGHT PAREN");   
+                System.out.println("Se esperaba RIGHT PAREN");
+                return null;   
             }
         }
         else{
             hayErrores = true;
             System.out.println("Se esperaba '(', un IDENTIFICADOR, una STRING, 'true', 'false', 'null', o un NUMERO");
+            return null;
         }
     }
     
