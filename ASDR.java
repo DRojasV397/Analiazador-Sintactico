@@ -18,7 +18,7 @@ public class ASDR implements Parser{
     private List<TipoToken> primeroWHILE_STMT= new ArrayList<>();
     private List<TipoToken> primeroBLOCK_STMT= new ArrayList<>();
     private List<TipoToken> primeroVAR_DECL= new ArrayList<>();
-    private List<Statement> sentencias = new ArrayList<>();
+    private List<Statement> sentenciasProg = new ArrayList<>();
 
     public ASDR(List<Token> tokens){
         this.tokens = tokens;
@@ -92,14 +92,14 @@ public class ASDR implements Parser{
 
     // PROGRAM -> DECLARATION
     private void PROGRAM(){
-            DECLARATION();
+            DECLARATION(sentenciasProg);
     }
     
     /************************************************************************
      *                            Declaraciones
     ************************************************************************/
 
-    private void DECLARATION(){
+    private void DECLARATION(List<Statement> sentencias){
         Statement sentencia;
         if(hayErrores)
             return;
@@ -114,19 +114,19 @@ public class ASDR implements Parser{
         else if(preanalisis.tipo == TipoToken.FUN){
             sentencia = FUN_DECL();
             sentencias.add(sentencia);
-            DECLARATION();
+            DECLARATION(sentencias);
         }
         // DECLARATION -> VAR_DECL DECLARATION
         else if (preanalisis.tipo == TipoToken.VAR){
             sentencia = VAR_DECL();
             sentencias.add(sentencia);
-            DECLARATION();
+            DECLARATION(sentencias);
         }
         // DECLARATION -> STATEMENT DECLARATION
         else if (primeroSTATEMENT.contains(preanalisis.tipo)){
             sentencia = STATEMENT();
             sentencias.add(sentencia);
-            DECLARATION();
+            DECLARATION(sentencias);
         }
         /*
         * La producción DECLARATION -> Ɛ no se incluye en codigo, debido a esto, 
