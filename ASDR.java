@@ -236,60 +236,64 @@ public class ASDR implements Parser{
              // -> RETURN_STMT
              // -> WHILE_STMT
              // -> BLOCK
-    private void STATEMENT(){
+    private Statement STATEMENT(){
         if (hayErrores) {
-            return; 
+            return null; 
         }
         if (primeroEXPR_STMT.contains(preanalisis.tipo)) {
-            EXPR_STMT();
+            return EXPR_STMT();
         } 
         else if (primeroFOR_STMT.contains(preanalisis.tipo)) {
-            FOR_STMT();
+            return FOR_STMT();
         } 
         else if (primeroIF_STMT.contains(preanalisis.tipo)){
-            IF_STMT();
+            return IF_STMT();
         }
         else if (primeroPRINT_STMT.contains(preanalisis.tipo)) {
-            PRINT_STMT();
+            return PRINT_STMT();
         } 
         else if (primeroRETURN_STMT.contains(preanalisis.tipo)){
-            RETURN_STMT();
+            return RETURN_STMT();
         }
         else if (primeroWHILE_STMT.contains(preanalisis.tipo)) {
-            WHILE_STMT();
+            return WHILE_STMT();
         } 
         else if (primeroBLOCK_STMT.contains(preanalisis.tipo)){
-            BLOCK();
+            return BLOCK();
         }
         else {
             hayErrores=true;
             System.out.println("Se esperaba una SENTENCIA");
+            return null;
         }
     }
     //EXPR_STMT -> EXPRESSION ;
-    private void EXPR_STMT(){
+    private Statement EXPR_STMT(){
         if (hayErrores) {
-            return;
+            return null;
         }
         else if (primeroEXPR_STMT.contains(preanalisis.tipo)) {
-            EXPRESSION();
+            StmtExpression expresion = new StmtExpression(EXPRESSION());
             if (preanalisis.tipo==TipoToken.SEMICOLON) {
                 match(TipoToken.SEMICOLON);
+                return expresion;
             } else {
                 hayErrores=true;
                 System.out.println("Se esperaba un ;");
+                return null;
             }
         }
         else {
             hayErrores=true;
             System.out.println("Se esperaba un EXPRESION");
+            return null;
         }
         
     }
     //FOR_STMT -> for ( FOR_STMT_1 FOR_STMT_2 FOR_STMT_3 ) STATEMENT
-    private void FOR_STMT(){
+    private Statement FOR_STMT(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (preanalisis.tipo==TipoToken.FOR) {
             match(TipoToken.FOR);
@@ -305,16 +309,19 @@ public class ASDR implements Parser{
                 else{
                     hayErrores=true;
                     System.out.println("Se esperaba un RIGHT PAREN");
+                    return null;
                 }
             }
             else{
                 hayErrores=true;
                 System.out.println("Se esperaba un LEFT PAREN");
+                return null;
             }
         }
         else{
             hayErrores=true;
             System.out.println("Se esperaba un FOR");
+            return null;
         }
     }
     // FOR_STMT_1 -> VAR_DECL
@@ -373,143 +380,164 @@ public class ASDR implements Parser{
         }
     }
     //IF_STMT -> if (EXPRESSION) STATEMENT ELSE_STATEMENT
-    private void IF_STMT(){
+    private Statement IF_STMT(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (preanalisis.tipo==TipoToken.IF) {
             match(TipoToken.IF);
             if (preanalisis.tipo==TipoToken.LEFT_PAREN) {
                 match(TipoToken.LEFT_PAREN);
-                EXPRESSION();
+                StmtExpression condition= new StmtExpression(EXPRESSION());
                 if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                     match(TipoToken.RIGHT_PAREN);
-                    STATEMENT();
-                    ELSE_STATEMENT();
+                    Statement thenBranch = STATEMENT();
+                    Statement elseBranch = ELSE_STATEMENT();
+                    return new StmtIf(condition.expression,thenBranch,elseBranch);
                 }
                 else{
                     hayErrores=true;
                     System.out.println("Se esperaba un RIGHT PAREN");
+                    return null;
                 }
             }
             else{
                 hayErrores=true;
                 System.out.println("Se esperaba un LEFT PAREN");
+                return null;
             }
         }
         else{
             hayErrores=true;
             System.out.println("Se esperaba un IF");
+            return null;
         }
     }
     // ELSE_STATEMENT -> else STATEMENT
     //                -> Ɛ
-    private void ELSE_STATEMENT(){
+    private Statement ELSE_STATEMENT(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (preanalisis.tipo==TipoToken.ELSE) {
             match(TipoToken.ELSE);
-            STATEMENT();
+            Statement stmnt = STATEMENT();
+            return stmnt;
         }
+        return null;
     }
     //PRINT_STMT -> print EXPRESSION ;      
-    private void PRINT_STMT(){
+    private Statement PRINT_STMT(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (preanalisis.tipo==TipoToken.PRINT) {
             match(TipoToken.PRINT);
-            EXPRESSION();
+            StmtExpression expression = new StmtExpression(EXPRESSION());
             if (preanalisis.tipo==TipoToken.SEMICOLON) {
                 match(TipoToken.SEMICOLON);
+                return new StmtPrint(expression.expression);
             } else {
                 hayErrores=true;
                 System.out.println("Se esperaba un ;");
+                return null;
             }
         }
         else{
             hayErrores=true;
             System.out.println("Se esperaba un PRINT");
+            return null;
         }
     }
     //RETURN_STMT -> return RETURN_EXP_OPC ;
-    private void RETURN_STMT(){
+    private Statement RETURN_STMT(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (preanalisis.tipo==TipoToken.RETURN) {
             match(TipoToken.RETURN);
-            RETURN_EXP_OPC();
+            Statement opcional = RETURN_EXP_OPC();
             if (preanalisis.tipo==TipoToken.SEMICOLON) {
                 match(TipoToken.SEMICOLON);
+                return opcional;
             } else {
                 hayErrores=true;
                 System.out.println("Se esperaba un ;");
+                return null;
             }
         }
         else{
             hayErrores=true;
             System.out.println("Se esperaba un RETURN");
+            return null;
         }
     }
     //RETURN_EXP_OPC -> EXPRESSION
     //               -> Ɛ
-    private void RETURN_EXP_OPC(){
+    private Statement RETURN_EXP_OPC(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (primeroEXPRESSION.contains(preanalisis.tipo)) {
-            EXPRESSION();
+            StmtExpression value = new StmtExpression(EXPRESSION());
+            return new StmtReturn(value.expression);
         }
+        return null;
     }
     //WHILE_STMT -> while ( EXPRESSION ) STATEMENT
-    private void WHILE_STMT(){
+    private Statement WHILE_STMT(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (preanalisis.tipo==TipoToken.WHILE) {
             match(TipoToken.WHILE);
             if (preanalisis.tipo==TipoToken.LEFT_PAREN) {
                 match(TipoToken.LEFT_PAREN);
-                EXPRESSION();
+                Expression condicon = EXPRESSION();
                 if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                     match(TipoToken.RIGHT_PAREN);
-                    STATEMENT();
+                    Statement body = STATEMENT();
+                    return new StmtLoop(condicon, body);
                 }
                 else{
                     hayErrores=true;
                     System.out.println("Se esperaba un RIGHT PAREN");
+                    return null;
                 }
             }
             else{
                 hayErrores=true;
                 System.out.println("Se esperaba un LEFT PAREN");
+                return null;
             }
         }
         else{
             hayErrores=true;
             System.out.println("Se esperaba un WHILE");
+            return null;
         }
     }
 
     //BLOCK -> { DECLARATION }
-    private void BLOCK(){
+    private Statement BLOCK(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (preanalisis.tipo==TipoToken.LEFT_BRACE) {
             match(TipoToken.LEFT_BRACE);
             DECLARATION();
             if (preanalisis.tipo==TipoToken.RIGHT_BRACE) {
                 match(TipoToken.RIGHT_BRACE);
+                return null; //Corregir
             } else {
                 hayErrores=true;
                 System.out.println("Se esperaba un RIGHT BRACE"); 
+                return null;
             }
         } else {
             hayErrores=true;
             System.out.println("Se esperaba un LEFT BRACE");
+            return null;
         }
     }
 
