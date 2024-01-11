@@ -34,12 +34,13 @@ public class Interprete {
     private static void ejecutarPrompt() throws IOException {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
+        TablaSimbolos tablaSimbolos = new TablaSimbolos(null);
 
         for(;;){
             System.out.print(">>> ");
             String linea = reader.readLine();
             if(linea == null) break; // Presionar Ctrl + D
-            ejecutar(linea);
+            ejecutar(linea, tablaSimbolos);
             existenErrores = false;
         }
     }
@@ -55,12 +56,22 @@ public class Interprete {
 
             Parser parser = new ASDR(tokens);
             parser.parse();
-
         }
         catch (Exception ex){
             ex.printStackTrace();
         }
+    }
 
+    private static void ejecutar(String source, TablaSimbolos tabla){
+        try {
+            Scanner scanner = new Scanner(source);
+            List<Token> tokens = scanner.scan();
+            Parser parser = new ASDR(tokens);
+            parser.parse();
+            parser.obtenerSentencias().forEach(sentencia -> sentencia.exec(tabla));   
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*

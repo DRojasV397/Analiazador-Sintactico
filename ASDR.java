@@ -90,6 +90,10 @@ public class ASDR implements Parser{
         return false;
     }
 
+    public List<Statement> obtenerSentencias(){
+        return sentenciasProg;
+    }
+
     // PROGRAM -> DECLARATION
     private void PROGRAM(){
             DECLARATION(sentenciasProg);
