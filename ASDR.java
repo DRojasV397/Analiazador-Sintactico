@@ -268,7 +268,7 @@ public class ASDR implements Parser{
         }
     }
     //EXPR_STMT -> EXPRESSION ;
-    private Statement EXPR_STMT(){
+    private StmtExpression EXPR_STMT(){
         if (hayErrores) {
             return null;
         }
@@ -290,6 +290,12 @@ public class ASDR implements Parser{
         }
         
     }
+    //FOR_STMT_1
+    // while (FOR_STMT_2){
+        // STATEMENT
+        // FOR_STMT_3
+    //}
+
     //FOR_STMT -> for ( FOR_STMT_1 FOR_STMT_2 FOR_STMT_3 ) STATEMENT
     private Statement FOR_STMT(){
         if (hayErrores) {
@@ -299,12 +305,23 @@ public class ASDR implements Parser{
             match(TipoToken.FOR);
             if (preanalisis.tipo==TipoToken.LEFT_PAREN) {
                 match(TipoToken.LEFT_PAREN);
-                FOR_STMT_1();
-                FOR_STMT_2();
-                FOR_STMT_3();
+                Statement for1= FOR_STMT_1();
+                StmtExpression for2= FOR_STMT_2();
+                StmtExpression for3 = FOR_STMT_3();
                 if (preanalisis.tipo==TipoToken.RIGHT_PAREN) {
                     match(TipoToken.RIGHT_PAREN);
-                    STATEMENT();
+                    Statement stm = STATEMENT();
+                    List<Statement> body= new ArrayList<Statement>();
+                    List<Statement> incializacion= new ArrayList<Statement>();
+                    body.add(stm);
+                    body.add(for3);
+                    StmtBlock bodyBlock = new StmtBlock(body);
+                    StmtLoop stm_while = new StmtLoop(for2.expression, bodyBlock);
+                    incializacion.add(for1);
+                    incializacion.add(stm_while);
+                    StmtBlock stm_for = new StmtBlock(incializacion);
+                    return stm_for;
+
                 }
                 else{
                     hayErrores=true;
@@ -327,60 +344,70 @@ public class ASDR implements Parser{
     // FOR_STMT_1 -> VAR_DECL
     //            -> EXPR_STMT
     //            -> ;
-    private void FOR_STMT_1(){
+    private Statement FOR_STMT_1(){
         if (hayErrores) {
-            return;
+            return null;
         }
         if (primeroVAR_DECL.contains(preanalisis.tipo)) {
-            VAR_DECL();
+            StmtVar declaracion = VAR_DECL();
+            return declaracion;
         }
         else if (primeroEXPR_STMT.contains(preanalisis.tipo)) {
-            EXPR_STMT();
+            StmtExpression exp = EXPR_STMT();
+            return exp;
         }
         else if(preanalisis.tipo==TipoToken.SEMICOLON){
             match(TipoToken.SEMICOLON);
+            return null;
         }
         else {
             hayErrores=true;
             System.out.println("Se esperaba una PRIMERA SENTENCIA FOR");
+            return null;
         }
     }
 //     FOR_STMT_2 -> EXPRESSION;
                // -> ;
-    private void FOR_STMT_2(){
+    private StmtExpression FOR_STMT_2(){
         if (hayErrores) {
-            return;
+            return null;
         }
         else if (primeroEXPRESSION.contains(preanalisis.tipo)) {
-            EXPRESSION();
+            StmtExpression exp = new StmtExpression(EXPRESSION());
             if (preanalisis.tipo==TipoToken.SEMICOLON) {
                 match(TipoToken.SEMICOLON);
+                return exp;
             } else {
                 hayErrores=true;
                 System.out.println("Se esperaba un ;");
+                return  null;
             }
         }
         else if(preanalisis.tipo==TipoToken.SEMICOLON){
             match(TipoToken.SEMICOLON);
+            return null;
         }
         else {
             hayErrores=true;
             System.out.println("Se esperaba una SEGUNDA SENTENCIA FOR");
+            return null;
         }
     }
 
     // FOR_STMT_3 -> EXPRESSION
     //            -> Ɛ
-    private void FOR_STMT_3(){
+    private StmtExpression FOR_STMT_3(){
         if (hayErrores) {
-            return;
+            return null;
         }
         else if (primeroEXPRESSION.contains(preanalisis.tipo)) {
-            EXPRESSION();
+            StmtExpression exp = new StmtExpression(EXPRESSION());
+            return exp;
         }
+        return null;
     }
     //IF_STMT -> if (EXPRESSION) STATEMENT ELSE_STATEMENT
-    private Statement IF_STMT(){
+    private StmtIf IF_STMT(){
         if (hayErrores) {
             return null;
         }
@@ -519,16 +546,17 @@ public class ASDR implements Parser{
     }
 
     //BLOCK -> { DECLARATION }
-    private Statement BLOCK(){
+    private StmtBlock BLOCK(){
         if (hayErrores) {
             return null;
         }
         if (preanalisis.tipo==TipoToken.LEFT_BRACE) {
             match(TipoToken.LEFT_BRACE);
-            DECLARATION();
+            List<Statement> statements = new ArrayList<Statement>();
+            DECLARATION(statements);
             if (preanalisis.tipo==TipoToken.RIGHT_BRACE) {
                 match(TipoToken.RIGHT_BRACE);
-                return null; //Corregir
+                return new StmtBlock(statements);
             } else {
                 hayErrores=true;
                 System.out.println("Se esperaba un RIGHT BRACE"); 
