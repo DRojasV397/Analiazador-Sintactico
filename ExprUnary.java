@@ -6,4 +6,20 @@ public class ExprUnary extends Expression{
         this.operator = operator;
         this.right = right;
     }
+
+    @Override
+    Object solve(TablaSimbolos tablaSimbolos) {
+        if(operator.tipo == TipoToken.MINUS)
+            try {
+                return (boolean) right.solve(tablaSimbolos);
+            } catch (Exception e) {
+                throw new RuntimeException("Error: El operando debe ser booleano");
+            }
+        else
+        try {
+            return (boolean) right.solve(tablaSimbolos);
+        } catch (Exception e) {
+            throw new RuntimeException("Error: El operando debe ser booleano");
+        }
+    }
 }
