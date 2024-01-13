@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 public class StmtFunction extends Statement {
@@ -9,5 +10,13 @@ public class StmtFunction extends Statement {
         this.name = name;
         this.params = params;
         this.body = body;
+    }
+    @Override
+    public void exec(TablaSimbolos tablaSimbolos){
+        List<Object> cuerpo = new ArrayList<>();
+        cuerpo.add(params);
+        cuerpo.add(body);
+        if(!tablaSimbolos.existeIdentificador(name.lexema))
+            tablaSimbolos.asignar(name.lexema, cuerpo);
     }
 }

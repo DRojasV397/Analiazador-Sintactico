@@ -6,4 +6,9 @@ public class StmtLoop extends Statement {
         this.condition = condition;
         this.body = body;
     }
+    public void exec(TablaSimbolos tablaSimbolos){
+        while((boolean)condition.solve(tablaSimbolos)){
+            body.exec(tablaSimbolos);
+        }
+    }
 }
