@@ -1,4 +1,6 @@
 import java.util.List;
+import java.util.ArrayList;
+
 
 public class ExprCallFunction extends Expression{
     final Expression callee;
@@ -35,8 +37,9 @@ public class ExprCallFunction extends Expression{
         try {
             List<Object> parametrosResultos = new ArrayList<Object>();
             for (Expression parametro : parametros) {
-                parametros.add(parametro.solve(tablaSimbolos));
+                parametrosResultos.add(parametro.solve(tablaSimbolos));
             }
+            return parametrosResultos;
         } catch (Exception e) {
             throw new RuntimeException("Error: No se pudieron resolver los argumentos para " + callee.toString());
         }
@@ -50,10 +53,13 @@ public class ExprCallFunction extends Expression{
         TablaSimbolos instanciaFuncion = new TablaSimbolos(tabla);
         List<Token> parametros = (List<Token>) funcion.get(0);
         for(int i = 0; i < argumentos.size(); i++){
-            instanciaFuncion.declarar(parametros.get(i), argumentos.get(i ));
+            instanciaFuncion.declarar(parametros.get(i).lexema, argumentos.get(i ));
         }
         instanciaFuncion.declarar("return", null);
         List<Statement> cuerpo = (List<Statement>) funcion.get(1);
+        for (Statement statement : cuerpo) {
+            statement.exec(instanciaFuncion);
+        }
         return instanciaFuncion.obtener("return");
     }
 }
