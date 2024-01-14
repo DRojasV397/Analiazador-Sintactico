@@ -155,7 +155,7 @@ public class Scanner {
                     }
                     if(i == source.length()-1){
                         lexema = "";
-                        Token t = new Token(TipoToken.EOF, lexema);
+                        Token t = new Token(TipoToken.EOF, lexema, linea, posicion);
                         tokens.add(t);
                     }
                 break;
@@ -165,11 +165,11 @@ public class Scanner {
                 case 1:
                     if(c == '='){
                         lexema += c;
-                        Token t = new Token(TipoToken.GREATER_EQUAL, lexema);
+                        Token t = new Token(TipoToken.GREATER_EQUAL, lexema, linea, posicion);
                         tokens.add(t);
                     }
                     else{
-                        Token t = new Token(TipoToken.GREATER, lexema);
+                        Token t = new Token(TipoToken.GREATER, lexema, linea, posicion);
                         tokens.add(t);
                         i--;
                         posicion--;
@@ -180,11 +180,11 @@ public class Scanner {
                 case 2:
                     if(c == '='){
                         lexema += c;
-                        Token t = new Token(TipoToken.LESS_EQUAL, lexema);
+                        Token t = new Token(TipoToken.LESS_EQUAL, lexema, linea, posicion);
                         tokens.add(t);
                     }
                     else{
-                        Token t = new Token(TipoToken.LESS, lexema);
+                        Token t = new Token(TipoToken.LESS, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -195,11 +195,11 @@ public class Scanner {
                 case 7:
                     if(c == '='){
                         lexema += c;
-                        Token t = new Token(TipoToken.EQUAL_EQUAL, lexema);
+                        Token t = new Token(TipoToken.EQUAL_EQUAL, lexema, linea, posicion);
                         tokens.add(t);
                     }
                     else{
-                        Token t = new Token(TipoToken.EQUAL, lexema);
+                        Token t = new Token(TipoToken.EQUAL, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -210,11 +210,11 @@ public class Scanner {
                 case 10:
                     if(c == '='){
                         lexema += c;
-                        Token t = new Token(TipoToken.BANG_EQUAL, lexema);
+                        Token t = new Token(TipoToken.BANG_EQUAL, lexema, linea, posicion);
                         tokens.add(t);
                     }
                     else{
-                        Token t = new Token(TipoToken.BANG, lexema);
+                        Token t = new Token(TipoToken.BANG, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -233,11 +233,11 @@ public class Scanner {
                     else{
                         TipoToken tt = palabrasReservadas.get(lexema);
                         if(tt == null){
-                            Token t = new Token(TipoToken.IDENTIFIER, lexema);
+                            Token t = new Token(TipoToken.IDENTIFIER, lexema, linea, posicion);
                             tokens.add(t);
                         }
                         else{
-                            Token t = new Token(tt, lexema);
+                            Token t = new Token(tt, lexema, linea, posicion);
                             tokens.add(t);
                         }
                         estado = 0;
@@ -263,7 +263,7 @@ public class Scanner {
                         lexema += c;
                     }
                     else{
-                        Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
+                        Token t = new Token(TipoToken.NUMBER, lexema, linea, posicion, Integer.valueOf(lexema));
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
@@ -278,7 +278,7 @@ public class Scanner {
                     }
                     else{
                         lexema = lexema.substring(0, lexema.length() - 1);
-                        Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
+                        Token t = new Token(TipoToken.NUMBER, lexema, linea, posicion, Integer.valueOf(lexema));
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
@@ -296,7 +296,7 @@ public class Scanner {
                         lexema += c;
                     }
                     else{
-                        Token t = new Token(TipoToken.NUMBER, lexema, Float.parseFloat(lexema));
+                        Token t = new Token(TipoToken.NUMBER, lexema, linea, posicion, Float.parseFloat(lexema));
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
@@ -316,12 +316,12 @@ public class Scanner {
                     else{
                         if(lexema.contains(".")){
                             lexema = lexema.substring(0, lexema.length() - 1);
-                            Token t = new Token(TipoToken.NUMBER, lexema, Integer.valueOf(lexema));
+                            Token t = new Token(TipoToken.NUMBER, lexema, linea, posicion, Integer.valueOf(lexema));
                             tokens.add(t);
                         }
                         else{
                             lexema = lexema.substring(0, lexema.length() - 1);
-                            Token t = new Token(TipoToken.NUMBER, lexema, Float.parseFloat(lexema));
+                            Token t = new Token(TipoToken.NUMBER, lexema, linea, posicion, Float.parseFloat(lexema));
                             tokens.add(t);
                         }
                         i-=2;
@@ -336,7 +336,7 @@ public class Scanner {
                         lexema += c;
                     }
                     else{
-                        Token t = new Token(TipoToken.NUMBER, lexema, Double.parseDouble(lexema));
+                        Token t = new Token(TipoToken.NUMBER, lexema, linea, posicion, Double.parseDouble(lexema));
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
@@ -352,7 +352,7 @@ public class Scanner {
                     else{
                         System.out.println("Hola");
                         lexema = lexema.substring(0, lexema.length() - 2);
-                        Token t = new Token(TipoToken.NUMBER, lexema, Float.parseFloat(lexema));
+                        Token t = new Token(TipoToken.NUMBER, lexema, linea, posicion, Float.parseFloat(lexema));
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
@@ -391,7 +391,7 @@ public class Scanner {
                     }
                     else{
                         lexema += c;
-                        Token t = new Token(TipoToken.STRING, lexema, lexema.substring(1, lexema.length() - 1));
+                        Token t = new Token(TipoToken.STRING, lexema, linea, posicion, lexema.substring(1, lexema.length() - 1));
                         tokens.add(t);
                         estado = 0;
                         lexema = "";
@@ -410,7 +410,7 @@ public class Scanner {
                         lexema = "";
                     }
                     else{
-                        Token t = new Token(TipoToken.SLASH, lexema);
+                        Token t = new Token(TipoToken.SLASH, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -457,7 +457,7 @@ public class Scanner {
                 //                                      Tokens de un caracter
                 //--------------------------------------------------------------------------------------------------
                 case 21:{
-                    Token t = new Token(TipoToken.PLUS, lexema);
+                    Token t = new Token(TipoToken.PLUS, lexema, linea, posicion);
                     tokens.add(t);
                     i--; 
                     posicion--;
@@ -465,7 +465,7 @@ public class Scanner {
                     estado = 0;
                 break;}
                 case 22:{
-                        Token t = new Token(TipoToken.MINUS, lexema);
+                        Token t = new Token(TipoToken.MINUS, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -473,7 +473,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 23:{
-                        Token t = new Token(TipoToken.STAR, lexema);
+                        Token t = new Token(TipoToken.STAR, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -481,7 +481,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 24:{
-                        Token t = new Token(TipoToken.LEFT_BRACE, lexema);
+                        Token t = new Token(TipoToken.LEFT_BRACE, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -489,7 +489,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 25:{
-                        Token t = new Token(TipoToken.RIGHT_BRACE, lexema);
+                        Token t = new Token(TipoToken.RIGHT_BRACE, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -497,7 +497,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 26:{
-                        Token t = new Token(TipoToken.LEFT_PAREN, lexema);
+                        Token t = new Token(TipoToken.LEFT_PAREN, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -505,7 +505,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 27:{
-                        Token t = new Token(TipoToken.RIGHT_PAREN, lexema);
+                        Token t = new Token(TipoToken.RIGHT_PAREN, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -513,7 +513,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 28:{
-                        Token t = new Token(TipoToken.COMMA, lexema);
+                        Token t = new Token(TipoToken.COMMA, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -521,7 +521,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 29:{
-                        Token t = new Token(TipoToken.DOT, lexema);
+                        Token t = new Token(TipoToken.DOT, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;
@@ -529,7 +529,7 @@ public class Scanner {
                         estado = 0;
                 break;}
                 case 30:{
-                        Token t = new Token(TipoToken.SEMICOLON, lexema);
+                        Token t = new Token(TipoToken.SEMICOLON, lexema, linea, posicion);
                         tokens.add(t);
                         i--; 
                         posicion--;

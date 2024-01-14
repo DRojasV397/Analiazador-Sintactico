@@ -44,7 +44,8 @@ public class ExprBinary extends Expression{
                             else
                                 return leftDouble / rightDouble;
                         } else 
-                            throw new RuntimeException("Error: División por cero");
+                            ASDR.error(operator.posicion, String.valueOf(operator.posicion), "División por cero");
+                        break;
                     case BANG_EQUAL:
                         return (leftValue != rightValue);
                     case EQUAL_EQUAL:
@@ -64,10 +65,10 @@ public class ExprBinary extends Expression{
                 if(operator.tipo == TipoToken.PLUS)
                     return leftValue.toString() + rightValue.toString();
             } else {
-                throw new RuntimeException("Error: Operandos no numéricos");
+                ASDR.error(operator.linea, String.valueOf(operator.posicion), "Operandos no numéricos");
             }
         } catch (Exception e) {
-            throw new RuntimeException("");
+            ASDR.error(operator.posicion, String.valueOf(operator.posicion),"No se pudo resolver la operación.");
         }
         return null;
     }

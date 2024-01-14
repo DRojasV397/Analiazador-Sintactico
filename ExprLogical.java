@@ -17,7 +17,8 @@ public class ExprLogical extends Expression{
             else
             return (boolean) left.solve(tablaSimbolos) && (boolean) right.solve(tablaSimbolos);
         } catch (Exception e) {
-            throw new RuntimeException("Error: Los operadores deben ser booleanos");
+            ASDR.error(operator.posicion, String.valueOf(operator.posicion),"Error: Los operadores deben ser booleanos");
+            return null;
         }
     }
 }

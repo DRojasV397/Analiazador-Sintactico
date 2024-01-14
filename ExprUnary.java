@@ -13,13 +13,15 @@ public class ExprUnary extends Expression{
             try {
                 return (boolean) right.solve(tablaSimbolos);
             } catch (Exception e) {
-                throw new RuntimeException("Error: El operando debe ser booleano");
+                ASDR.error(operator.posicion, String.valueOf(operator.posicion),"El operando debe ser numerico");
+                return null;
             }
         else
-        try {
-            return (boolean) right.solve(tablaSimbolos);
-        } catch (Exception e) {
-            throw new RuntimeException("Error: El operando debe ser booleano");
-        }
+            try {
+                return (boolean) right.solve(tablaSimbolos);
+            } catch (Exception e) {
+                ASDR.error(operator.posicion, String.valueOf(operator.posicion),"El operando debe ser booleano");
+                return null;
+            }
     }
 }

@@ -33,7 +33,7 @@ public class ExprCallFunction extends Expression{
             throw new RuntimeException("Error: " + callee.toString() + " ya se declaro.");
     }
 
-    List<Object> resolverArgumetos(TablaSimbolos tablaSimbolos, List<Expression> parametros){
+    List<Object> resolverArgumentos(TablaSimbolos tablaSimbolos, List<Expression> parametros){
         try {
             List<Object> parametrosResultos = new ArrayList<Object>();
             for (Expression parametro : parametros) {

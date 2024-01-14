@@ -12,7 +12,7 @@ public class ExprAssign extends Expression{
         if(tablaSimbolos.existeIdentificador(name.lexema))
             tablaSimbolos.asignar(name.lexema, value.solve(tablaSimbolos));
         else
-            throw new RuntimeException("Variable no declarada (" + name.lexema + ").");
+            ASDR.error(name.linea, String.valueOf(name.posicion), "Variable no declarada (" + name.lexema + ").");
         return null;
     }
     
