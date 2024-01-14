@@ -25,7 +25,7 @@ public class Interprete {
 
     private static void ejecutarArchivo(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
-        ejecutar(new String(bytes, Charset.defaultCharset()));
+        ejecutar(new String(bytes, Charset.defaultCharset()), new TablaSimbolos(null));
 
         // Se indica que existe un error
         if(existenErrores) System.exit(65);
@@ -42,23 +42,6 @@ public class Interprete {
             if(linea == null) break; // Presionar Ctrl + D
             ejecutar(linea, tablaSimbolos);
             existenErrores = false;
-        }
-    }
-
-    private static void ejecutar(String source) {
-        try{
-            Scanner scanner = new Scanner(source);
-            List<Token> tokens = scanner.scan();
-
-            /*for(Token token : tokens){
-                System.out.println(token);
-            }*/
-
-            Parser parser = new ASDR(tokens);
-            parser.parse();
-        }
-        catch (Exception ex){
-            ex.printStackTrace();
         }
     }
 
