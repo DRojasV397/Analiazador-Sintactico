@@ -4,4 +4,8 @@ public class StmtReturn extends Statement {
     StmtReturn(Expression value) {
         this.value = value;
     }
+    @Override
+    void exec(TablaSimbolos tablaSimbolos) {
+        tablaSimbolos.asignar("return", value.solve(tablaSimbolos));
+    }
 }
