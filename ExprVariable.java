@@ -6,6 +6,11 @@ class ExprVariable extends Expression {
     }
 
     @Override
+    public String toString(){
+        return name.lexema;
+    }
+
+    @Override
     Object solve(TablaSimbolos tablaSimbolos) {
         return tablaSimbolos.obtener(name.lexema);
     }

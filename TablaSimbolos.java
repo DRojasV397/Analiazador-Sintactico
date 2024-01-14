@@ -40,4 +40,8 @@ public class TablaSimbolos {
             else
                 anterior.asignar(identificador, valor);
     }
+
+    void declarar(String identificador, Object valor){
+        values.put(identificador, valor);
+    }
 }

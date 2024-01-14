@@ -10,6 +10,6 @@ public class StmtVar extends Statement {
     @Override
     void exec(TablaSimbolos tablaSimbolos) {
         if(!tablaSimbolos.existeIdentificador(name.lexema))
-            tablaSimbolos.asignar(name.lexema, initializer.solve(tablaSimbolos));
+            tablaSimbolos.declarar(name.lexema, initializer.solve(tablaSimbolos));
     }
 }
