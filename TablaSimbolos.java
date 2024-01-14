@@ -15,7 +15,7 @@ public class TablaSimbolos {
             return true;
         else 
             if(anterior == null)
-                throw new RuntimeException("Variable no declarada (" + identificador + ")");
+                    return false;
             else
                 return anterior.existeIdentificador(identificador);
     }
@@ -30,13 +30,15 @@ public class TablaSimbolos {
                 return anterior.obtener(identificador);
     }
 
-
     void asignar(String identificador, Object valor){
         if(values.containsKey(identificador))
             values.put(identificador, valor);
         else
             if(anterior == null)
-                throw new RuntimeException("Variable no declarada (" + identificador + ")");
+                if(identificador == "return")
+                    throw new RuntimeException("Error: Uso invalido de return");
+                else
+                    throw new RuntimeException("Variable no declarada (" + identificador + ")");
             else
                 anterior.asignar(identificador, valor);
     }
